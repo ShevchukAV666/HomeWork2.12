@@ -5,58 +5,70 @@ import org.junit.jupiter.api.Test;
 import work.home.home_work_2_12.interfaces.EmployeeService;
 import work.home.home_work_2_12.services.EmployeeServiceImpl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestsEmployeeService {
 
-    EmployeeService employeeService;
+    EmployeeService employeeBookService;
 
     @BeforeEach
     public void setUp() {
-
-        employeeService = new EmployeeServiceImpl();
+        employeeBookService = new EmployeeServiceImpl();
     }
 
     @Test
-    public void testAddEmployee() {
-        String lastName = "Артём";
-        String firstName = "Шевчук";
-        int salary = 90000;
-        String department = "Java";
+    public void TestAddEmployee() {
+        Employee employee = new Employee("Шевчук", "Артём",
+                90000, "Java");
 
-        String result = employeeService.addEmployee(lastName, firstName, salary, department);
+        Map<String, Employee> expected = new HashMap<>();
+        expected.put("Шевчук Артём", employee);
 
-        assertNotNull(result);
-        assertEquals("Артём Шевчук", result);
+        employeeBookService.addEmployee("Шевчук", "Артём",
+                90000, "Java");
 
-        assertEquals(result, employeeService.findEmployee(lastName, firstName));
+        Map<String, Employee> actual = employeeBookService.getEmployees();
+
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void testRemoveEmployee() {
-        String lastName = "Артём";
-        String firstName = "Шевчук";
+    public void TestRemoveEmployee() {
+        Employee employee1 = new Employee("Шевчук", "Артём",
+                90000, "Java");
 
-        employeeService.addEmployee(lastName, firstName, 90000, "Java");
+        Employee employee2 = new Employee("Бодров", "Сергей",
+                60000, "Java2");
 
-        String result = employeeService.removeEmployee(lastName, firstName);
+        Map<String, Employee> expected = new HashMap<>();
+        expected.put("Шевчук Артём", employee1);
 
-        assertNotNull(result);
-        assertEquals("Артём Шевчук", result);
+        employeeBookService.addEmployee("Шевчук", "Артём",
+                90000, "Java");
 
-        assertThrows(RuntimeException.class, () -> employeeService.findEmployee(lastName, firstName));
+        employeeBookService.addEmployee("Бодров", "Сергей",
+                60000, "Java2");
+
+        employeeBookService.removeEmployee("Бодров", "Сергей");
+
+        Map<String, Employee> actual = employeeBookService.getEmployees();
+
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void testFindEmployee() {
-        String lastName = "Артём";
-        String firstName = "Шевчук";
+    public void TestFindEmployee() {
 
-        employeeService.addEmployee(lastName, firstName, 90000, "Java");
+        String expected = "Фамилия: Шевчук, имя: Артём, зарплата: 90000, отдел: Java";
 
-        String result = employeeService.findEmployee(lastName, firstName);
+        employeeBookService.addEmployee("Шевчук", "Артём",
+                90000, "Java");
 
-        assertNotNull(result);
-        assertEquals("Артём Шевчук", result);
+        String actual = employeeBookService.findEmployee("Шевчук", "Артём");
+
+        assertEquals(expected, actual);
     }
 }

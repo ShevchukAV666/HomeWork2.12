@@ -6,9 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import work.home.home_work_2_12.interfaces.DepartmentService;
 import work.home.home_work_2_12.interfaces.EmployeeService;
 import work.home.home_work_2_12.services.DepartmentServiceImpl;
 
@@ -20,76 +22,140 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class TestsDepartmentService {
 
+    private DepartmentService departmentService;
+
     @Mock
     private EmployeeService employeeService;
 
-    @InjectMocks
-    private DepartmentServiceImpl departmentService;
-
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        departmentService = new DepartmentServiceImpl(employeeService);
     }
 
     @Test
-    public void testGetEmployeesByDepartment() {
+    public void TestGetEmployeesByDepartment() {
+
         assertNotNull(employeeService);
-        String department = "IT";
-        List<Employee> expectedEmployees = Arrays.asList(
-                new Employee("Smith", "John", 50000, "IT"),
-                new Employee("Doe", "Jane", 60000, "IT")
-        );
 
-        when(employeeService.getEmployees()).thenReturn(createMockEmployeeData());
-        when(employeeService.getEmployees().values()).thenReturn(expectedEmployees);
+        Employee employee = new Employee("Шевчук", "Артём",
+                90000, "Java");
 
-        List<Employee> employees = departmentService.getEmployeesByDepartment(department);
-
-        assertNotNull(employees);
-        assertEquals(2, employees.size());
-        assertTrue(employees.stream().allMatch(e -> e.getDepartment().equals(department)));
-
-        verify(employeeService, times(1)).getEmployees();
-    }
-
-    @Test
-    public void testMockSumSalaryByDepartment() {
-        assertNotNull(employeeService);
-        String department = "HR";
-        int expectedSumSalary = 150000;
-
-        when(employeeService.getEmployees()).thenReturn(createMockEmployeeData());
-        when(employeeService.getEmployees().values()).thenReturn(Arrays.asList(
-                new Employee("Smith", "John", 50000, "IT"),
-                new Employee("Doe", "Jane", 60000, "HR"),
-                new Employee("Johnson", "Alex", 40000, "HR")
-        ));
-
-        int sumSalary = departmentService.sumSalaryByDepartment(department);
-
-        assertEquals(expectedSumSalary, sumSalary);
-
-        verify(employeeService, times(1)).getEmployees();
-    }
-
-    private Map<String, Employee> createMockEmployeeData() {
         Map<String, Employee> employees = new HashMap<>();
-        employees.put("Smith John", new Employee("Smith", "John", 50000, "IT"));
-        employees.put("Doe Jane", new Employee("Doe", "Jane", 60000, "HR"));
-        employees.put("Johnson Alex", new Employee("Johnson", "Alex", 40000, "HR"));
-        return employees;
+        employees.put("Шевчук Артём ", employee);
+
+        Mockito.when(employeeService.getEmployees()).thenReturn(employees);
+
+        List<Employee> expected = new ArrayList<>();
+        expected.add(employee);
+
+        List<Employee> actual = departmentService.getEmployeesByDepartment("Java");
+
+        assertEquals(expected, actual);
     }
 
     @Test
-    public void testSumSalaryByDepartment() {
+    public void TestSumSalaryByDepartment() {
+        assertNotNull(employeeService);
 
-        String department = "HR";
-        int expectedSumSalary = 150000;
+        Employee employee1 = new Employee("Шевчук", "Артём",
+                90000, "Java");
+        Employee employee2 = new Employee("Бодров", "Сергей",
+                60000, "Java");
+        Employee employee3 = new Employee("Безруков", "Александр",
+                50000, "Java3");
 
-        int sumSalary = departmentService.sumSalaryByDepartment(department);
+        Map<String, Employee> employees = new HashMap<>();
+        employees.put("Шевчук Артём", employee1);
+        employees.put("Бодров Сергей", employee2);
+        employees.put("Безруков Александр", employee3);
 
-        assertEquals(expectedSumSalary, sumSalary);
+        Mockito.when(employeeService.getEmployees()).thenReturn(employees);
+
+        int expected = 200000;
+
+        int actual = departmentService.sumSalaryByDepartment("Java");
+
+        assertEquals(expected, actual);
+
     }
 
+    @Test
+    public void TestMaxSalaryByDepartment() {
+        assertNotNull(employeeService);
 
+        Employee employee1 = new Employee("Шевчук", "Артём",
+                90000, "Java");
+        Employee employee2 = new Employee("Бодров", "Сергей",
+                60000, "Java");
+        Employee employee3 = new Employee("Безруков", "Александр",
+                50000, "Java3");
+
+        Map<String, Employee> employees = new HashMap<>();
+        employees.put("Шевчук Артём", employee1);
+        employees.put("Бодров Сергей", employee2);
+        employees.put("Безруков Александр", employee3);
+
+        Mockito.when(employeeService.getEmployees()).thenReturn(employees);
+
+        int expected = 90000;
+
+        int actual = departmentService.maxSalaryByDepartment("Java");
+
+        assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void minSalaryByDepartmentTest() {
+        assertNotNull(employeeService);
+
+        Employee employee1 = new Employee("Шевчук", "Артём",
+                90000, "Java");
+        Employee employee2 = new Employee("Бодров", "Сергей",
+                60000, "Java");
+        Employee employee3 = new Employee("Безруков", "Александр",
+                50000, "Java3");
+
+        Map<String, Employee> employees = new HashMap<>();
+        employees.put("Шевчук Артём", employee1);
+        employees.put("Бодров Сергей", employee2);
+        employees.put("Безруков Александр", employee3);
+
+        Mockito.when(employeeService.getEmployees()).thenReturn(employees);
+
+        int expected = 50000;
+
+        int actual = departmentService.minSalaryByDepartment("Java");
+
+        assertEquals(expected, actual);
+
+    }
+
+    @Test
+    public void TestGetEmployeesByDepartments() {
+
+        Employee employee1 = new Employee("Шевчук", "Артём",
+                90000, "Java");
+        Employee employee2 = new Employee("Бодров", "Сергей",
+                60000, "Java");
+        Employee employee3 = new Employee("Безруков", "Александр",
+                50000, "Java3");
+
+        Map<String, Employee> employees = new HashMap<>();
+        employees.put("Шевчук Артём", employee1);
+        employees.put("Бодров Сергей", employee2);
+        employees.put("Безруков Александр", employee3);
+
+        Mockito.when(employeeService.getEmployees()).thenReturn(employees);
+
+        Map<String, List<Employee>> expected = new HashMap<>();
+        expected.put("Java", Arrays.asList(employee1, employee2));
+        expected.put("Java3", Arrays.asList(employee3));
+
+        Map<String, List<Employee>> actual = departmentService.getEmployeesByDepartments();
+
+        assertEquals(expected.keySet(), actual.keySet());
+        assertEquals(expected.size(), actual.size());
+        assertEquals(expected.get("Java").get(0), actual.get("Java").get(1));
+    }
 }
